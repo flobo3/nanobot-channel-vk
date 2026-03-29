@@ -1,0 +1,9 @@
+pyproject.toml
+nanobot_channel_vk/__init__.py
+nanobot_channel_vk/plugin.py
+nanobot_channel_vk.egg-info/PKG-INFO
+nanobot_channel_vk.egg-info/SOURCES.txt
+nanobot_channel_vk.egg-info/dependency_links.txt
+nanobot_channel_vk.egg-info/entry_points.txt
+nanobot_channel_vk.egg-info/requires.txt
+nanobot_channel_vk.egg-info/top_level.txt

@@ -1,0 +1,1 @@
+"""VK channel plugin for nanobot."""

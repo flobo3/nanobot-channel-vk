@@ -1,0 +1,2 @@
+[nanobot.channels]
+vk = nanobot_channel_vk.plugin:VKChannel

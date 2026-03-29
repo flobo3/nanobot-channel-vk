@@ -1,0 +1,14 @@
+[project]
+name = "nanobot-channel-vk"
+version = "0.1.0"
+description = "VK channel plugin for nanobot"
+authors = [{ name = "flobo3", email = "floptopbot33@gmail.com" }]
+dependencies = [
+    "nanobot-ai",
+    "vkbottle",
+    "loguru",
+    "pydantic"
+]
+
+[project.entry-points."nanobot.channels"]
+vk = "nanobot_channel_vk.plugin:VKChannel"
