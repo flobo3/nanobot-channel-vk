@@ -106,6 +106,29 @@ class VKChannel(BaseChannel):
                     "conversation_message_id": message.conversation_message_id
                 }
             )
+            
+            # Set "typing" status
+            try:
+                await self.bot.api.messages.set_activity(
+                    peer_id=int(chat_id),
+                    type="typing"
+                )
+            except Exception as e:
+                logger.debug(f"Failed to set typing status: {e}")
+                
+            # Try to set "eyes" reaction if conversation_message_id is available
+            if message.conversation_message_id:
+                try:
+                    await self.bot.api.request(
+                        "messages.sendReaction",
+                        {
+                            "peer_id": int(chat_id),
+                            "cmid": message.conversation_message_id,
+                            "reaction_id": 1  # 1 is usually "smile" or "like", VK doesn't have standard "eyes" reaction ID documented publicly, but we can try.
+                        }
+                    )
+                except Exception as e:
+                    logger.debug(f"Failed to set reaction: {e}")
 
         # Start the polling loop in the background
         self._task = asyncio.create_task(self.bot.run_polling())
