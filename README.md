@@ -68,6 +68,10 @@ Restart your nanobot. It will automatically discover the plugin via Python `entr
 
 ---
 
+*Inspired by [openclaw-vk](https://github.com/pfrankov/openclaw-vk)*
+
+---
+
 <a id="русский-язык"></a>
 ## nanobot-channel-vk
 
@@ -134,3 +138,7 @@ uv pip install nanobot-channel-vk
 ### 4. Запуск
 
 Перезапустите nanobot. Он автоматически найдет плагин через механизм `entry_points` Python и запустит опрос ВКонтакте!
+
+---
+
+*Inspired by [openclaw-vk](https://github.com/pfrankov/openclaw-vk)*

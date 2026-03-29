@@ -1,6 +1,9 @@
 import asyncio
 import logging
+import os
+import tempfile
 from typing import Any
+import aiohttp
 
 from loguru import logger
 from pydantic import BaseModel, Field
@@ -13,6 +16,7 @@ logger.disable("vkbottle")
 from nanobot.bus.events import OutboundMessage
 from nanobot.bus.queue import MessageBus
 from nanobot.channels.base import BaseChannel
+from nanobot.config.paths import get_media_dir
 
 
 class VKConfig(BaseModel):
@@ -52,6 +56,26 @@ class VKChannel(BaseChannel):
             "allow_from": ["*"]
         }
 
+    async def _download_media(self, url: str, ext: str = ".jpg") -> str | None:
+        """Download media from URL to the nanobot media directory."""
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    if resp.status == 200:
+                        data = await resp.read()
+                        media_dir = get_media_dir("vk")
+                        # Generate a unique filename using tempfile but in the media_dir
+                        fd, path = tempfile.mkstemp(suffix=ext, prefix="vk_media_", dir=str(media_dir))
+                        with os.fdopen(fd, 'wb') as f:
+                            f.write(data)
+                        return path
+                    else:
+                        logger.error(f"Failed to download media: HTTP {resp.status}")
+                        return None
+        except Exception as e:
+            logger.error(f"Error downloading media: {e}")
+            return None
+
     async def start(self) -> None:
         if not self.config.enabled or not self.config.token:
             logger.info("VK channel disabled or missing token")
@@ -79,9 +103,16 @@ class VKChannel(BaseChannel):
                         # Get the largest photo URL
                         sizes = sorted(att.photo.sizes, key=lambda s: s.width * s.height, reverse=True)
                         if sizes:
-                            media.append(sizes[0].url)
+                            url = sizes[0].url
+                            local_path = await self._download_media(url, ext=".jpg")
+                            if local_path:
+                                media.append(local_path)
                     elif att.doc and att.doc.url:
-                        media.append(att.doc.url)
+                        url = att.doc.url
+                        ext = os.path.splitext(att.doc.title)[1] if att.doc.title else ".bin"
+                        local_path = await self._download_media(url, ext=ext)
+                        if local_path:
+                            media.append(local_path)
             
             # Extract reply context if any
             reply_ctx = None
