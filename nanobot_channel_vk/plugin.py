@@ -21,6 +21,7 @@ class VKConfig(BaseModel):
     token: str = ""
     group_id: int = 0
     allow_from: list[str] = Field(default_factory=list, alias="allowFrom")
+    reaction_id: int = 33
 
     class Config:
         populate_by_name = True
@@ -106,15 +107,15 @@ class VKChannel(BaseChannel):
             except Exception as e:
                 logger.debug(f"Failed to set typing status: {e}")
                 
-            # Try to set "eyes" reaction if conversation_message_id is available
-            if message.conversation_message_id:
+            # Try to set reaction if conversation_message_id is available
+            if message.conversation_message_id and self.config.reaction_id > 0:
                 try:
                     await self.bot.api.request(
                         "messages.sendReaction",
                         {
                             "peer_id": int(chat_id),
                             "cmid": message.conversation_message_id,
-                            "reaction_id": 8  # 8 is usually "eyes" (👀) in VK API, 1 is heart/like.
+                            "reaction_id": self.config.reaction_id
                         }
                     )
                 except Exception as e:
