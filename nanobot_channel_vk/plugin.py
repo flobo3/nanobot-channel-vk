@@ -1,9 +1,13 @@
 import asyncio
+import logging
 from typing import Any
 
 from loguru import logger
 from pydantic import BaseModel, Field
 from vkbottle.bot import Bot, Message
+
+# Disable verbose vkbottle debug logs
+logging.getLogger("vkbottle").setLevel(logging.WARNING)
 
 from nanobot.bus.events import OutboundMessage
 from nanobot.bus.queue import MessageBus
@@ -92,17 +96,6 @@ class VKChannel(BaseChannel):
                 
             logger.debug(f"VK message from {sender_id}: {content[:50]}...")
             
-            await self._handle_message(
-                sender_id=sender_id,
-                chat_id=chat_id,
-                content=content,
-                media=media,
-                metadata={
-                    "message_id": message.id,
-                    "conversation_message_id": message.conversation_message_id
-                }
-            )
-            
             # Set "typing" status
             try:
                 await self.bot.api.messages.set_activity(
@@ -125,6 +118,17 @@ class VKChannel(BaseChannel):
                     )
                 except Exception as e:
                     logger.debug(f"Failed to set reaction: {e}")
+            
+            await self._handle_message(
+                sender_id=sender_id,
+                chat_id=chat_id,
+                content=content,
+                media=media,
+                metadata={
+                    "message_id": message.id,
+                    "conversation_message_id": message.conversation_message_id
+                }
+            )
 
         # Start the polling loop in the background
         self._task = asyncio.create_task(self.bot.run_polling())
