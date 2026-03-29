@@ -4,6 +4,10 @@ from typing import Any
 from loguru import logger
 from pydantic import BaseModel, Field
 from vkbottle.bot import Bot, Message
+from vkbottle import logger as vkbottle_logger
+
+# Disable verbose vkbottle debug logs
+vkbottle_logger.disable("vkbottle")
 
 from nanobot.bus.events import OutboundMessage
 from nanobot.bus.queue import MessageBus
