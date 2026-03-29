@@ -1,4 +1,0 @@
-nanobot-ai
-vkbottle
-loguru
-pydantic

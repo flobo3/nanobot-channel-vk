@@ -1,9 +1,0 @@
-Metadata-Version: 2.4
-Name: nanobot-channel-vk
-Version: 0.1.0
-Summary: VK channel plugin for nanobot
-Author-email: flobo3 <floptopbot33@gmail.com>
-Requires-Dist: nanobot-ai
-Requires-Dist: vkbottle
-Requires-Dist: loguru
-Requires-Dist: pydantic
