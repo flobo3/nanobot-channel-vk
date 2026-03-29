@@ -15,7 +15,10 @@ class VKConfig(BaseModel):
     enabled: bool = False
     token: str = ""
     group_id: int = 0
-    allow_from: list[str] = Field(default_factory=list)
+    allow_from: list[str] = Field(default_factory=list, alias="allowFrom")
+
+    class Config:
+        populate_by_name = True
 
 
 class VKChannel(BaseChannel):
