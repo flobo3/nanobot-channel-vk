@@ -114,7 +114,7 @@ class VKChannel(BaseChannel):
                         {
                             "peer_id": int(chat_id),
                             "cmid": message.conversation_message_id,
-                            "reaction_id": 1  # 1 is usually "smile" or "like", VK doesn't have standard "eyes" reaction ID documented publicly, but we can try.
+                            "reaction_id": 8  # 8 is usually "eyes" (👀) in VK API, 1 is heart/like.
                         }
                     )
                 except Exception as e:
