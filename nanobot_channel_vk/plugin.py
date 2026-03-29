@@ -8,6 +8,7 @@ from vkbottle.bot import Bot, Message
 
 # Disable verbose vkbottle debug logs
 logging.getLogger("vkbottle").setLevel(logging.WARNING)
+logger.disable("vkbottle")
 
 from nanobot.bus.events import OutboundMessage
 from nanobot.bus.queue import MessageBus
