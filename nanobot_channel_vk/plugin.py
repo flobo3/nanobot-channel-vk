@@ -21,7 +21,7 @@ class VKConfig(BaseModel):
     token: str = ""
     group_id: int = 0
     allow_from: list[str] = Field(default_factory=list, alias="allowFrom")
-    reaction_id: int = 33
+    reaction_id: int = 10
 
     class Config:
         populate_by_name = True
