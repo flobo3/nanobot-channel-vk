@@ -129,28 +129,32 @@ class VKChannel(BaseChannel):
                 
             logger.debug(f"VK message from {sender_id}: {content[:50]}...")
             
-            # Set "typing" status
-            try:
-                await self.bot.api.messages.set_activity(
-                    peer_id=int(chat_id),
-                    type="typing"
-                )
-            except Exception as e:
-                logger.debug(f"Failed to set typing status: {e}")
+            # Fire and forget typing and reaction to avoid blocking message processing
+            async def _set_typing_and_reaction():
+                # Try to set reaction first if conversation_message_id is available
+                if message.conversation_message_id and self.config.reaction_id > 0:
+                    try:
+                        await self.bot.api.request(
+                            "messages.sendReaction",
+                            {
+                                "peer_id": int(chat_id),
+                                "cmid": message.conversation_message_id,
+                                "reaction_id": self.config.reaction_id
+                            }
+                        )
+                    except Exception as e:
+                        logger.debug(f"Failed to set reaction: {e}")
                 
-            # Try to set reaction if conversation_message_id is available
-            if message.conversation_message_id and self.config.reaction_id > 0:
+                # Set "typing" status
                 try:
-                    await self.bot.api.request(
-                        "messages.sendReaction",
-                        {
-                            "peer_id": int(chat_id),
-                            "cmid": message.conversation_message_id,
-                            "reaction_id": self.config.reaction_id
-                        }
+                    await self.bot.api.messages.set_activity(
+                        peer_id=int(chat_id),
+                        type="typing"
                     )
                 except Exception as e:
-                    logger.debug(f"Failed to set reaction: {e}")
+                    logger.debug(f"Failed to set typing status: {e}")
+
+            asyncio.create_task(_set_typing_and_reaction())
             
             await self._handle_message(
                 sender_id=sender_id,
