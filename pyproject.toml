@@ -1,6 +1,6 @@
 [project]
 name = "nanobot-channel-vk"
-version = "0.1.0"
+version = "0.1.1"
 description = "VK channel plugin for nanobot"
 authors = [{ name = "flobo3" }]
 dependencies = [
