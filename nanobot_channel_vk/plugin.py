@@ -23,7 +23,6 @@ class VKConfig(BaseModel):
     """Configuration for VK channel."""
     enabled: bool = False
     token: str = ""
-    group_id: int = 0
     allow_from: list[str] = Field(default_factory=list, alias="allowFrom")
     reaction_id: int = Field(default=10, alias="reactionId")
 
@@ -52,7 +51,6 @@ class VKChannel(BaseChannel):
         return {
             "enabled": False,
             "token": "YOUR_VK_GROUP_TOKEN",
-            "group_id": 123456789,
             "allow_from": ["*"]
         }
 
