@@ -93,11 +93,12 @@ def _markdown_to_vk_html(text: str) -> str:
 
 
 def _tool_hint_to_vk_text(text: str) -> str:
-    """Render tool hints as collapsed text for VK.
+    """Render tool hints as a code block for VK.
 
-    VK has no expandable blockquote, so we prefix with a label.
+    VK renders ``` as a monospace code block, similar to Telegram's
+    expandable blockquote but without collapse.
     """
-    return f"[tool] {_escape_vk_html(text)}" if text else ""
+    return f"```\n{_escape_vk_html(text)}\n```" if text else ""
 
 
 # --- Media helpers ----------------------------------------------------------
