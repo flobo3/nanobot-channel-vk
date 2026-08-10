@@ -248,13 +248,30 @@ class VKChannel(BaseChannel):
             photos = message.get_photo_attachments()
             if photos:
                 for photo in photos:
-                    sizes = sorted(
-                        photo.sizes,
-                        key=lambda s: (s.width or 0) * (s.height or 0),
-                        reverse=True,
-                    )
-                    if sizes and sizes[0].url:
-                        local_path = await self._download_media(sizes[0].url, ext=".jpg")
+                    # vkbottle 4.7+: PhotosPhoto has `images` (List[PhotosImage]) + `photo_256`
+                    # Older versions had `sizes` (List[PhotosPhotoSize]).
+                    url = None
+                    if getattr(photo, "images", None):
+                        best = sorted(
+                            photo.images,
+                            key=lambda s: (s.width or 0) * (s.height or 0),
+                            reverse=True,
+                        )
+                        if best and best[0].url:
+                            url = best[0].url
+                    elif getattr(photo, "sizes", None):
+                        sizes = sorted(
+                            photo.sizes,
+                            key=lambda s: (s.width or 0) * (s.height or 0),
+                            reverse=True,
+                        )
+                        if sizes and sizes[0].url:
+                            url = sizes[0].url
+                    elif getattr(photo, "photo_256", None):
+                        url = photo.photo_256
+
+                    if url:
+                        local_path = await self._download_media(url, ext=".jpg")
                         if local_path:
                             media.append(local_path)
 
