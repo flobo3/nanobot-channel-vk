@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import re
+import ssl
 import tempfile
 from typing import Any
 
@@ -172,7 +173,18 @@ class VKChannel(BaseChannel):
     async def _download_media(self, url: str, ext: str = ".jpg") -> str | None:
         """Download media from URL to the nanobot media directory."""
         try:
-            async with aiohttp.ClientSession() as session:
+            # VK userapi.com servers sometimes fail SSL cert verification on Windows.
+            # Use certifi CA bundle as fallback when system certs are missing.
+            ssl_ctx = ssl.create_default_context()
+            try:
+                import certifi
+                ssl_ctx.load_verify_locations(certifi.where())
+            except ImportError:
+                pass  # fall back to system certs
+
+            async with aiohttp.ClientSession(
+                connector=aiohttp.TCPConnector(ssl=ssl_ctx)
+            ) as session:
                 async with session.get(url) as resp:
                     if resp.status == 200:
                         data = await resp.read()
