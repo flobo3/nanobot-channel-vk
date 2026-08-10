@@ -262,23 +262,30 @@ class VKChannel(BaseChannel):
                 for photo in photos:
                     # vkbottle 4.7+: PhotosPhoto has `images` (List[PhotosImage]) + `photo_256`
                     # Older versions had `sizes` (List[PhotosPhotoSize]).
+                    # Pick the smallest image >= 400px wide to avoid huge downloads.
                     url = None
                     if getattr(photo, "images", None):
-                        best = sorted(
+                        imgs = sorted(
                             photo.images,
                             key=lambda s: (s.width or 0) * (s.height or 0),
-                            reverse=True,
                         )
-                        if best and best[0].url:
-                            url = best[0].url
+                        for img in imgs:
+                            if (img.width or 0) >= 400 and img.url:
+                                url = img.url
+                                break
+                        if not url and imgs and imgs[-1].url:
+                            url = imgs[-1].url  # fallback to largest
                     elif getattr(photo, "sizes", None):
                         sizes = sorted(
                             photo.sizes,
                             key=lambda s: (s.width or 0) * (s.height or 0),
-                            reverse=True,
                         )
-                        if sizes and sizes[0].url:
-                            url = sizes[0].url
+                        for s in sizes:
+                            if (s.width or 0) >= 400 and s.url:
+                                url = s.url
+                                break
+                        if not url and sizes and sizes[-1].url:
+                            url = sizes[-1].url
                     elif getattr(photo, "photo_256", None):
                         url = photo.photo_256
 
